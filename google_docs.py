@@ -12,9 +12,13 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 # The ID of a sample document.
 DOCUMENT_ID = GOOGLE_DOCS_TEST_FILE_ID
 
-def main(term, year):
-    """Shows basic usage of the Docs API.
-    Prints the title of a sample document.
+def generate_meeting_notes(term, year, members, task_list, slideshow_link):
+    """
+    members: string[]
+    term: string
+    year: number
+    task_list: string[]
+    slideshow_link: string
     """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -314,16 +318,16 @@ def main(term, year):
         }
     ]
 
-    text1 = "Attendees\n"
-    text2 = "Facilitator:\nNotetaker:\nAttendees:"
-
+    attendees_header = "Attendees\n"
+    attendees_subsections = "Facilitator:\nNotetaker:\nAttendees:\n"
+    attendees_length = len(attendees_header)+len(attendees_subsections)
     attendees_requests = [
         {
             "insertText": {
                 "location": {
                     "index": start_index+heading_length+details_length
                 },
-                "text": text1
+                "text": attendees_header
             }
         },
         {
@@ -335,16 +339,16 @@ def main(term, year):
                 "fields": "alignment,namedStyleType",
                 "range":{
                     "startIndex": start_index+heading_length+details_length,
-                    "endIndex": start_index+heading_length+details_length+len(text1)
+                    "endIndex": start_index+heading_length+details_length+len(attendees_header)
                 }
             }
         },
         {
             "insertText": {
                 "location": {
-                    "index": start_index+heading_length+details_length+len(text1)
+                    "index": start_index+heading_length+details_length+len(attendees_header)
                 },
-                "text": text2
+                "text": attendees_subsections
             }
         },
         {
@@ -355,8 +359,8 @@ def main(term, year):
                 },
                 "fields": "alignment,namedStyleType",
                 "range":{
-                    "startIndex": start_index+heading_length+details_length+len(text1),
-                    "endIndex": start_index+heading_length+details_length+len(text1)+len(text2)
+                    "startIndex": start_index+heading_length+details_length+len(attendees_header),
+                    "endIndex": start_index+heading_length+details_length+len(attendees_header)+len(attendees_subsections)
                 }
             }
         },
@@ -367,11 +371,46 @@ def main(term, year):
                 } ,
                 "fields": "bold",
                 "range":{
-                    "startIndex": start_index+heading_length+details_length+len(text1),
-                    "endIndex": start_index+heading_length+details_length+len(text1)+len(text2)
+                    "startIndex": start_index+heading_length+details_length+len(attendees_header),
+                    "endIndex": start_index+heading_length+details_length+len(attendees_header)+len(attendees_subsections)
                 }
             }
         },
+    ]
+    agenda_header_text = "Agenda\n"
+    agenda_header = [
+        {
+            "insertText": {
+                "location": {
+                    "index": start_index+heading_length+details_length+attendees_length
+                },
+                "text": agenda_header_text
+            }
+        },
+        {
+            "updateParagraphStyle": {
+                "paragraphStyle": {
+                    "alignment": "START",
+                    "namedStyleType": "HEADING_2"
+                },
+                "fields": "alignment,namedStyleType",
+                "range":{
+                    "startIndex": start_index+heading_length+details_length+attendees_length,
+                    "endIndex": start_index+heading_length+details_length+attendees_length+len(agenda_header_text)
+                }
+            }
+        },
+    ]
+
+    agenda_items = [
+        "Member Updates\n",
+        "\n".join([f"\t{member}" for member in members]),
+        "\n",
+        "Tasks\n",
+        "\n".join([f"\t{task}" for task in task_list]),
+        "\n",
+        "Adding to slideshow for this weekend\n",
+        f"\tLink to the slideshow: {slideshow_link}"
     ]
     # Attempt to update the document
     update_body = {
@@ -386,6 +425,38 @@ def main(term, year):
             *heading_requests,
             *details_requests,
             *attendees_requests,
+            *agenda_header,
+            {
+                "insertText": {
+                    "location": {
+                        "index": start_index+heading_length+details_length+attendees_length+len(agenda_header_text)
+                    },
+                    "text": "".join(agenda_items)
+                }
+            },
+            {
+                "createParagraphBullets": {
+                    "range": {
+                        "startIndex": start_index+heading_length+details_length+attendees_length+len(agenda_header_text),
+                        "endIndex": start_index+heading_length+details_length+attendees_length+len(agenda_header_text)+(len("".join(agenda_items))),
+                    },
+                    "bulletPreset": "NUMBERED_UPPERROMAN_UPPERALPHA_DECIMAL",
+                }
+            },
+            {
+            "updateParagraphStyle": {
+                "paragraphStyle": {
+                    "alignment": "START",
+                    "namedStyleType": "NORMAL_TEXT"
+                },
+                "fields": "alignment,namedStyleType",
+                "range":{
+                    "startIndex": start_index+heading_length+details_length+attendees_length+len(agenda_header_text),
+                    "endIndex": start_index+heading_length+details_length+attendees_length+len(agenda_header_text)+(len("".join(agenda_items))),
+                }
+            }
+        },
+
         ]
     }
 
@@ -393,4 +464,7 @@ def main(term, year):
     print('The title of the document is: {}'.format(document.get('title')))
 
 if __name__ == "__main__":
-  main("spring", 2021)
+    member_list=["Quinn", "Evan", "Joshua", "Hassan", "William", "Zeel", "Suvasan", "Steven", "Muhammad", "Kush", "Jeff Z"]
+    task_list = ["Hello"]
+    slideshow_link = "https://teamwaterloop.ca"
+    generate_meeting_notes("spring", 2021, member_list, task_list, slideshow_link)

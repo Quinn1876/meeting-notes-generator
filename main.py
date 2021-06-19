@@ -1,4 +1,5 @@
 from clickup import ClickUp
+from google_docs import generate_meeting_notes
 
 def convertTaskListToParentListTree(task_list):
   task_dict = {}
@@ -27,9 +28,13 @@ if __name__=='__main__':
   in_progress_tasks = [task for task in ClickUp.getTasks() if task.isInProgress and (not task.isDesign)]
 
   parent_task_list = convertTaskListToParentListTree(in_progress_tasks)
+  google_task_list = []
 
   for task in parent_task_list:
-    print(str(task))
+    google_task_list.append(str(task))
     for child in task.getListOfChildren():
-      print(f'\t{str(child)}')
+      google_task_list.append(f'\t{str(child)}')
+  member_list=["Quinn", "Evan", "Joshua", "Hassan", "William", "Zeel", "Suvasan", "Steven", "Muhammad", "Kush", "Jeff Z"]
+  slideshow = "https://teamwaterloop.ca"
+  generate_meeting_notes("Spring", 2021, member_list, google_task_list, slideshow)
 
