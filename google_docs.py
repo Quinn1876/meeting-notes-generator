@@ -1,4 +1,4 @@
-from config import GOOGLE_DOCS_TEST_FILE_ID
+from config import GOOGLE_DOCS_TEST_FILE_ID, GOOGLE_DOCS_WEB_NOTES
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -10,7 +10,26 @@ from pprint import pprint
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 # The ID of a sample document.
-DOCUMENT_ID = GOOGLE_DOCS_TEST_FILE_ID
+DOCUMENT_ID = GOOGLE_DOCS_WEB_NOTES
+
+class NamedStyleTypes:
+    HEADING_1 = "HEADING_1"
+    HEADING_2 = "HEADING_2"
+    NORMAL_TEXT = "NORMAL_TEXT"
+
+
+class ParagraphStyles:
+    alignment = "alignment"
+    namedStyleType = "namedStyleType"
+
+class Paragraph:
+    def __init__(self) -> None:
+        self.text = ""
+        self.paragraphStyles= []
+        pass
+
+    def addParagraphStyle(self):
+        pass
 
 def generate_meeting_notes(term, year, members, task_list, slideshow_link):
     """
