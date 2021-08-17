@@ -25,7 +25,8 @@ def convertTaskListToParentListTree(task_list):
 
 
 if __name__=='__main__':
-  in_progress_tasks = [task for task in ClickUp.getTasks() if task.isInProgress and (not task.isDesign)]
+  # spring list is default, second list is for the autodoc project
+  in_progress_tasks = [task for task in [*ClickUp.getTasks(), *ClickUp.getTasks(list_id=84232391)] if task.isInProgress and (not task.isDesign)]
 
   parent_task_list = convertTaskListToParentListTree(in_progress_tasks)
   google_task_list = []

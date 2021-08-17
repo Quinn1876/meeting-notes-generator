@@ -33,9 +33,9 @@ class Paragraph:
 
 def generate_meeting_notes(term, year, members, task_list, slideshow_link):
     """
-    members: string[]
     term: string
     year: number
+    members: string[]
     task_list: string[]
     slideshow_link: string
     """
