@@ -6,6 +6,12 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from pprint import pprint
 
+"""
+Helpful links for understanding this script:
+https://developers.google.com/docs/api/reference/rest
+
+"""
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
